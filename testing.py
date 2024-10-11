@@ -3,14 +3,53 @@ import random
 
 x = 1
 y = 1
-width = 4
-height = 4
+width = 5
+height = 5
 
 g = [[0 for a in range(width)] for b in range(height)]
+#test case 1 X
+##g[1][1] = 1
+##g[2][2] = 1
+##g[3][3]= 1
+##g[1][3] = 1
+##g[3][1] = 1
+# expected result
+#[0][0][0][0][0]
+#[0][0][1][0][0]
+#[0][1][0][1][0]
+#[0][0][1][0][0]
+#[0][0][0][0][0]
+
+#test case 2 bird
+##g[1][1] = 1
+##g[1][2] = 1
+##g[2][3]= 1
+##g[0][2] = 1
+##g[1][3] = 1
+##g[2][4] = 1
+##g[3][2] = 1
+# expected result
+#[0][0][0][0][0]
+#[0][1][0][1][0]
+#[0][1][0][1][0]
+#[0][1][1][1][0]
+#[0][0][0][0][0]
+
+#test case 3 star
+##g[1][2] = 1
+##g[2][1] = 1
+##g[2][3]= 1
+##g[3][2] = 1
+# expected result
+#[0][0][0][0][0]
+#[0][1][1][1][0]
+#[0][1][0][1][0]
+#[0][1][1][1][0]
+#[0][0][0][0][0]
 for r in g:
-    for cell in range(0,len(r)):
-        if random.randint(0,1) ==  1:
-            r[cell] = 1
+    #for cell in range(0,len(r)):
+        #if random.randint(0,1) ==  1:
+            #r[cell] = 1
     print (r)
             
 
