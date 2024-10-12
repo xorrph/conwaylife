@@ -1,12 +1,21 @@
 import time
 import random
+import tkinter as tk  # PEP8: `import *` is not preferred
 
 x = 1
 y = 1
-width = 5
-height = 5
+width = 15
+height = 15
 
-g = [[0 for a in range(width)] for b in range(height)]
+g = [[random.randint(0,1) for a in range(width)] for b in range(height)]
+gen = 1
+
+class MyMap():
+    def __init__(self, master, i, j, colour,text):
+        self.text = tk.StringVar(master, value=text)
+        self.colour = colour
+        self.label = tk.Label(master, textvariable=self.text, height=1, width=3, relief='flat', bg=self.colour, fg="white")
+        self.label.grid(row=i, column=j, sticky='w')
 #test case 1 X
 ##g[1][1] = 1
 ##g[2][2] = 1
@@ -77,9 +86,9 @@ g = [[0 for a in range(width)] for b in range(height)]
 #[0][0][0][0][0]
 
 #test case 5 |
-g[1][2] = 1
-g[2][2] = 1
-g[3][2]= 1
+#g[1][2] = 1
+#g[2][2] = 1
+#g[3][2]= 1
 ### expected result
 #[0][0][0][0][0]
 #[0][0][0][0][0]
@@ -89,37 +98,19 @@ g[3][2]= 1
 
 import copy
 
-for r in g:
-    #for cell in range(0,len(r)):
-        #if random.randint(0,1) ==  1:
-            #r[cell] = 1
-    print (r)
             
 
-def updateBoard(g,x,y,width,height,newG):
+def updateBoard(g, x, y, width, height, newG):
     newG = copy.deepcopy(newG)
-    livecount = checkNeighbours(g,x,y,width,height)
-    if livecount < 2:
-        newG[x][y] = 0
-    elif livecount > 3:
+    livecount = checkNeighbours(g, width, height, x, y)
+    if livecount < 2 or livecount > 3:
         newG[x][y] = 0
     elif livecount == 3:
         newG[x][y] = 1
     return newG
 
-def runGen(g,x,y,width,height):
-    userinp = input("enter 0 to end the game")
-    newG = g.copy()
-    while userinp != "0":
-        for x in range(width):
-            for y in range(height):
-                newG = updateBoard(g,x,y,width,height,newG)
-        print()
-        for r in newG:print(r)
-        userinp = input("enter 0 to end the game")
-        g = copy.deepcopy(newG)
 
-def checkNeighbours(g,x,y,width,height):
+def checkNeighbours(g,width,height,x,y):
         livecount = 0
         if x == 0 and y == 0: # top left corner
             for i in range(x, x + 2):
@@ -186,8 +177,40 @@ def checkNeighbours(g,x,y,width,height):
                             livecount += 1
         return livecount
 
+def update_grid():
+    global g, newG, gen
+    newG = copy.deepcopy(g)
+    for x in range(width):
+        for y in range(height):
+            newG = updateBoard(g, x, y, width, height, newG)
+    gen.set(f"Gen: {generation[0]}")  # Update generation counter
+    generation[0] += 1
 
-runGen(g,x,y,width,height)
-print()
-print()
-for r in g: print(r)
+
+    # Update the display grid
+    for r in range(width):
+        for c in range(height):
+            if g[r][c] == 1:
+                MyMap(root, r, c, "azure4","")
+            else:
+                MyMap(root, r, c, "white","")
+                
+
+    
+    g = copy.deepcopy(newG)
+    root.after(500, update_grid)  # Update every second
+
+
+
+# Create Tkinter root window
+root = tk.Tk()
+root.title("Game of Life")
+# Start updating the grid and GUI
+gen = tk.StringVar()
+generation = [1]
+tk.Label(root, textvariable=gen, height=1, width=10, relief='flat', bg="white", fg="black", font="Helvetica 12").grid(row=height, column=0, columnspan=width)
+update_grid()
+
+root.mainloop()
+
+
