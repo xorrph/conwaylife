@@ -1,0 +1,76 @@
+import time
+import random
+import tkinter as tk
+import copy
+
+width = 5
+height = 5
+
+# Initialize grid with random 0s and 1s
+g = [[random.randint(0, 1) for a in range(width)] for b in range(height)]
+
+class MyMap():
+    def __init__(self, master, i, j, colour):
+        self.text = tk.StringVar(master, value="")
+        self.label = tk.Label(master, textvariable=self.text, height=5, width=11, relief='flat', bg=colour, fg="white")
+        self.label.grid(row=i, column=j, sticky='w')
+
+    def update(self, colour):
+        self.label.config(bg=colour)  # Update the background color
+
+def updateBoard(g, x, y, width, height, newG):
+    newG = copy.deepcopy(newG)
+    livecount = checkNeighbours(g, width, height, x, y)
+    if livecount < 2 or livecount > 3:
+        newG[x][y] = 0
+    elif livecount == 3:
+        newG[x][y] = 1
+    return newG
+
+def checkNeighbours(g, width, height, x, y):
+    livecount = 0
+    for i in range(max(0, x - 1), min(width, x + 2)):
+        for j in range(max(0, y - 1), min(height, y + 2)):
+            if i == x and j == y:
+                continue
+            if g[i][j] == 1:
+                livecount += 1
+    return livecount
+
+def update_grid():
+    global g, newG, gen
+    newG = copy.deepcopy(g)
+    for x in range(width):
+        for y in range(height):
+            newG = updateBoard(g, x, y, width, height, newG)
+
+    # Update the display grid by changing label colors
+    for r in range(width):
+        for c in range(height):
+            if g[r][c] == 1:
+                grid_labels[r][c].update("azure4")  # Update color for live cells
+            else:
+                grid_labels[r][c].update("white")   # Update color for dead cells
+
+    g = copy.deepcopy(newG)
+    gen.set(f"Gen: {generation[0]}")  # Update generation counter
+    generation[0] += 1
+
+    root.after(1000, update_grid)  # Update every second
+
+# Create Tkinter root window
+root = tk.Tk()
+root.title("Game of Life")
+
+# Generation counter
+gen = tk.StringVar()
+generation = [1]
+tk.Label(root, textvariable=gen, height=1, width=10, relief='flat', bg="white", fg="black", font="Helvetica 12").grid(row=height, column=0, columnspan=width)
+
+# Initialize grid labels only once and store them in grid_labels
+grid_labels = [[MyMap(root, r, c, "white") for c in range(width)] for r in range(height)]
+
+# Start updating the grid and GUI
+update_grid()
+
+root.mainloop()
